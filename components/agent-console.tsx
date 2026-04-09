@@ -185,14 +185,63 @@ export default function AgentConsole(): React.ReactElement {
     return result.traces.filter((trace) => trace.success);
   }, [result]);
 
-  // this function copies final markdown to clipboard
+  // this function builds a full export report from the current run
+  const buildFullReport = (payload: AgentRunResult): string => {
+    const traceLines =
+      payload.traces.length > 0
+        ? payload.traces.map((trace) =>
+            trace.success
+              ? `${trace.provider} -> ${trace.model} -> success`
+              : `${trace.provider} -> ${trace.model} -> failed${trace.error ? ` (${trace.error})` : ""}`
+          )
+        : ["running in fallback mode without provider key"];
+
+    const validationIssues =
+      payload.validation.issues.length > 0 ? payload.validation.issues : ["no issues"];
+
+    return [
+      "# agentic run report",
+      "",
+      `query: ${payload.query}`,
+      "",
+      "## final response",
+      payload.finalMarkdown,
+      "",
+      "## summary output",
+      payload.summary,
+      "",
+      "## validation",
+      `passed: ${payload.validation.passed ? "yes" : "no"}`,
+      `score: ${payload.validation.score}`,
+      "issues:",
+      ...validationIssues.map((issue) => `- ${issue}`),
+      "",
+      "## linked topics",
+      ...(payload.linkedTopics.length > 0 ? payload.linkedTopics : ["none"]),
+      "",
+      "## used notes",
+      ...(payload.usedNoteTitles.length > 0 ? payload.usedNoteTitles : ["none"]),
+      "",
+      "## knowledge updates",
+      ...(payload.touchedFiles.length > 0 ? payload.touchedFiles : ["none"]),
+      "",
+      "## saved note preview",
+      payload.savedNotePreview,
+      "",
+      "## model trail",
+      ...traceLines,
+      ""
+    ].join("\n");
+  };
+
+  // this function copies full report to clipboard
   const handleCopyResult = async (): Promise<void> => {
-    if (!result?.finalMarkdown) {
+    if (!result) {
       return;
     }
 
     try {
-      await navigator.clipboard.writeText(result.finalMarkdown);
+      await navigator.clipboard.writeText(buildFullReport(result));
       setCopyState("done");
       setTimeout(() => {
         setCopyState("idle");
@@ -205,23 +254,23 @@ export default function AgentConsole(): React.ReactElement {
     }
   };
 
-  // this function downloads final markdown as a local file
+  // this function downloads full report as a local file
   const handleDownloadResult = (): void => {
-    if (!result?.finalMarkdown) {
+    if (!result) {
       return;
     }
 
-    const slug = query
+    const slug = (result.query || query)
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, " ")
       .trim()
       .replace(/\s+/g, "-")
-      .slice(0, 80) || "agentic-response";
-    const blob = new Blob([result.finalMarkdown], { type: "text/markdown;charset=utf-8" });
+      .slice(0, 80) || "agentic-run-report";
+    const blob = new Blob([buildFullReport(result)], { type: "text/markdown;charset=utf-8" });
     const href = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = href;
-    anchor.download = `${slug}.md`;
+    anchor.download = `${slug}-run-report.md`;
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -276,10 +325,10 @@ export default function AgentConsole(): React.ReactElement {
                   ? "copied"
                   : copyState === "error"
                     ? "copy failed"
-                    : "copy to clipboard"}
+                    : "copy full report"}
               </button>
               <button type="button" className="mini-button ghost" onClick={handleDownloadResult}>
-                download .md
+                download full .md
               </button>
             </div>
             <pre>{result.finalMarkdown}</pre>
