@@ -1,0 +1,246 @@
+/* this file defines black and white product styling */
+:root {
+  --bg: #060606;
+  --bg-soft: #101010;
+  --bg-card: #0e0e0e;
+  --line: #2a2a2a;
+  --line-strong: #4a4a4a;
+  --text: #f4f4f4;
+  --muted: #9b9b9b;
+  --good: #d7d7d7;
+  --danger: #b0b0b0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  color: var(--text);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.11), transparent 25%),
+    radial-gradient(circle at 84% 16%, rgba(255, 255, 255, 0.08), transparent 30%),
+    linear-gradient(145deg, #040404 0%, #0d0d0d 60%, #060606 100%);
+  font-family: var(--font-mono), monospace;
+}
+
+.page-wrap {
+  width: min(1080px, calc(100% - 2rem));
+  margin: 2rem auto 4rem;
+  display: grid;
+  gap: 1.2rem;
+}
+
+.hero-panel {
+  border: 1px solid var(--line);
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  padding: 1.2rem;
+  animation: rise 500ms ease;
+}
+
+.hero-kicker {
+  margin: 0;
+  color: var(--muted);
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.hero-title {
+  font-family: var(--font-display), serif;
+  margin: 0.55rem 0;
+  font-weight: 600;
+  line-height: 1.1;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+}
+
+.hero-copy {
+  margin: 0;
+  color: #cfcfcf;
+  max-width: 72ch;
+}
+
+.console-wrap {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.query-form {
+  display: grid;
+  gap: 0.65rem;
+  border: 1px solid var(--line);
+  background: rgba(7, 7, 7, 0.75);
+  padding: 1rem;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: lowercase;
+}
+
+.query-input {
+  border: 1px solid var(--line-strong);
+  background: #0b0b0b;
+  color: var(--text);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.95rem;
+  width: 100%;
+  resize: vertical;
+  padding: 0.75rem;
+  outline: none;
+  transition: border-color 160ms ease;
+}
+
+.query-input:focus {
+  border-color: #acacac;
+}
+
+.run-button {
+  border: 1px solid #f1f1f1;
+  background: linear-gradient(90deg, #f1f1f1, #bcbcbc);
+  color: #050505;
+  font-family: var(--font-mono), monospace;
+  font-weight: 700;
+  text-transform: lowercase;
+  width: fit-content;
+  padding: 0.55rem 0.95rem;
+  cursor: pointer;
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+.run-button:hover:enabled {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.run-button:disabled {
+  opacity: 0.56;
+  cursor: not-allowed;
+}
+
+.agent-rail {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.agent-chip {
+  border: 1px solid var(--line);
+  background: var(--bg-soft);
+  min-height: 3.6rem;
+  padding: 0.6rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.6rem;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.agent-chip.active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.16) 46%,
+    transparent 68%
+  );
+  animation: shimmer 1300ms infinite;
+}
+
+.agent-chip.done {
+  border-color: #707070;
+}
+
+.agent-icon {
+  font-size: 1.1rem;
+  color: #f0f0f0;
+  grid-row: 1 / span 2;
+}
+
+.agent-label {
+  text-transform: lowercase;
+  font-size: 0.86rem;
+}
+
+.agent-state {
+  color: var(--muted);
+  text-transform: lowercase;
+  font-size: 0.76rem;
+}
+
+.card {
+  border: 1px solid var(--line);
+  background: var(--bg-card);
+  padding: 0.85rem;
+  animation: rise 360ms ease;
+}
+
+.card-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.error-card {
+  border-color: #676767;
+}
+
+.card h3 {
+  margin: 0 0 0.55rem;
+  font-size: 0.85rem;
+  text-transform: lowercase;
+  color: #d8d8d8;
+}
+
+.card p {
+  margin: 0.2rem 0;
+}
+
+.card pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-mono), monospace;
+  color: #ececec;
+  line-height: 1.38;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 980px) {
+  .agent-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "updatedAt": "2026-04-09T00:00:00.000Z",
+  "nodes": [
+    {
+      "slug": "agentic-workflow-basics",
+      "title": "Agentic workflow basics",
+      "path": "knowledge/notes/agentic-workflow-basics.md",
+      "updatedAt": "2026-04-09T00:00:00.000Z"
+    },
+    {
+      "slug": "markdown-knowledge-graph",
+      "title": "Markdown knowledge graph",
+      "path": "knowledge/notes/markdown-knowledge-graph.md",
+      "updatedAt": "2026-04-09T00:00:00.000Z"
+    },
+    {
+      "slug": "model-fallback-strategy",
+      "title": "Model fallback strategy",
+      "path": "knowledge/notes/model-fallback-strategy.md",
+      "updatedAt": "2026-04-09T00:00:00.000Z"
+    }
+  ],
+  "edges": [
+    {
+      "from": "agentic-workflow-basics",
+      "to": "markdown-knowledge-graph"
+    },
+    {
+      "from": "agentic-workflow-basics",
+      "to": "model-fallback-strategy"
+    },
+    {
+      "from": "markdown-knowledge-graph",
+      "to": "agentic-workflow-basics"
+    },
+    {
+      "from": "model-fallback-strategy",
+      "to": "agentic-workflow-basics"
+    }
+  ]
+}
