@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-09T11:10:00.000Z",
+  "updatedAt": "2026-04-09T10:38:48.936Z",
   "nodes": [
     {
       "slug": "agentic-launch-roadmap",
@@ -30,6 +30,18 @@
       "title": "Model fallback strategy",
       "path": "knowledge/notes/model-fallback-strategy.md",
       "updatedAt": "2026-04-09T11:10:00.000Z"
+    },
+    {
+      "slug": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "title": "Create a production architecture plan to add supabase auth later without breaking the loca",
+      "path": "knowledge/notes/create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca.md",
+      "updatedAt": "2026-04-09T10:38:48.890Z"
+    },
+    {
+      "slug": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "title": "Create an architecture plan to add supabase auth later without breaking the local markdown",
+      "path": "knowledge/notes/create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown.md",
+      "updatedAt": "2026-04-09T10:01:10.560Z"
     }
   ],
   "edges": [
@@ -79,6 +91,10 @@
     },
     {
       "from": "markdown-knowledge-graph",
+      "to": "topic-slug"
+    },
+    {
+      "from": "markdown-knowledge-graph",
       "to": "agentic-workflow-basics"
     },
     {
@@ -100,6 +116,94 @@
     {
       "from": "model-fallback-strategy",
       "to": "deployment-persistence-on-vercel"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "supabase-auth-integration"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "local-markdown-workflow-preservation"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "environment-based-provider-fallback"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "agentic-architecture-design"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "mvp-scope-definition"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "deployment-persistence"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "schema-workflow-definition"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "agentic-launch-roadmap"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "agentic-workflow-basics"
+    },
+    {
+      "from": "create-a-production-architecture-plan-to-add-supabase-auth-later-without-breaking-the-loca",
+      "to": "deployment-persistence-on-vercel"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "supabase-auth-integration"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "agentic-architecture"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "local-markdown-workflow"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "authentication-agent-design"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "deployment-on-vercel"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "knowledge-graph-maintenance"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "model-fallback-strategy"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "agentic-launch-roadmap"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "deployment-persistence-on-vercel"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "agentic-workflow-basics"
+    },
+    {
+      "from": "create-an-architecture-plan-to-add-supabase-auth-later-without-breaking-the-local-markdown",
+      "to": "markdown-knowledge-graph"
     }
   ]
 }

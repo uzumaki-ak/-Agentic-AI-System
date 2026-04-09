@@ -212,6 +212,7 @@ body {
   gap: 0.5rem;
   margin: 0 0 0.7rem;
   flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .mini-button {
