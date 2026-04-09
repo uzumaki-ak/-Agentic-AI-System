@@ -207,6 +207,35 @@ body {
   margin: 0.2rem 0;
 }
 
+.result-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 0.7rem;
+  flex-wrap: wrap;
+}
+
+.mini-button {
+  border: 1px solid #f1f1f1;
+  background: #efefef;
+  color: #050505;
+  font-family: var(--font-mono), monospace;
+  font-weight: 700;
+  text-transform: lowercase;
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+  transition: filter 140ms ease, transform 140ms ease;
+}
+
+.mini-button:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.mini-button.ghost {
+  background: transparent;
+  color: #f1f1f1;
+}
+
 .card pre {
   margin: 0;
   white-space: pre-wrap;

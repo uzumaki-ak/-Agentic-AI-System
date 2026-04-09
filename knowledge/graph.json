@@ -1,26 +1,54 @@
 {
-  "updatedAt": "2026-04-09T00:00:00.000Z",
+  "updatedAt": "2026-04-09T11:10:00.000Z",
   "nodes": [
+    {
+      "slug": "agentic-launch-roadmap",
+      "title": "Agentic launch roadmap",
+      "path": "knowledge/notes/agentic-launch-roadmap.md",
+      "updatedAt": "2026-04-09T11:10:00.000Z"
+    },
     {
       "slug": "agentic-workflow-basics",
       "title": "Agentic workflow basics",
       "path": "knowledge/notes/agentic-workflow-basics.md",
-      "updatedAt": "2026-04-09T00:00:00.000Z"
+      "updatedAt": "2026-04-09T11:10:00.000Z"
+    },
+    {
+      "slug": "deployment-persistence-on-vercel",
+      "title": "Deployment persistence on vercel",
+      "path": "knowledge/notes/deployment-persistence-on-vercel.md",
+      "updatedAt": "2026-04-09T11:10:00.000Z"
     },
     {
       "slug": "markdown-knowledge-graph",
       "title": "Markdown knowledge graph",
       "path": "knowledge/notes/markdown-knowledge-graph.md",
-      "updatedAt": "2026-04-09T00:00:00.000Z"
+      "updatedAt": "2026-04-09T11:10:00.000Z"
     },
     {
       "slug": "model-fallback-strategy",
       "title": "Model fallback strategy",
       "path": "knowledge/notes/model-fallback-strategy.md",
-      "updatedAt": "2026-04-09T00:00:00.000Z"
+      "updatedAt": "2026-04-09T11:10:00.000Z"
     }
   ],
   "edges": [
+    {
+      "from": "agentic-launch-roadmap",
+      "to": "agentic-workflow-basics"
+    },
+    {
+      "from": "agentic-launch-roadmap",
+      "to": "markdown-knowledge-graph"
+    },
+    {
+      "from": "agentic-launch-roadmap",
+      "to": "model-fallback-strategy"
+    },
+    {
+      "from": "agentic-launch-roadmap",
+      "to": "deployment-persistence-on-vercel"
+    },
     {
       "from": "agentic-workflow-basics",
       "to": "markdown-knowledge-graph"
@@ -30,12 +58,48 @@
       "to": "model-fallback-strategy"
     },
     {
+      "from": "agentic-workflow-basics",
+      "to": "agentic-launch-roadmap"
+    },
+    {
+      "from": "agentic-workflow-basics",
+      "to": "deployment-persistence-on-vercel"
+    },
+    {
+      "from": "deployment-persistence-on-vercel",
+      "to": "agentic-workflow-basics"
+    },
+    {
+      "from": "deployment-persistence-on-vercel",
+      "to": "model-fallback-strategy"
+    },
+    {
+      "from": "deployment-persistence-on-vercel",
+      "to": "agentic-launch-roadmap"
+    },
+    {
       "from": "markdown-knowledge-graph",
       "to": "agentic-workflow-basics"
     },
     {
+      "from": "markdown-knowledge-graph",
+      "to": "model-fallback-strategy"
+    },
+    {
+      "from": "markdown-knowledge-graph",
+      "to": "agentic-launch-roadmap"
+    },
+    {
       "from": "model-fallback-strategy",
       "to": "agentic-workflow-basics"
+    },
+    {
+      "from": "model-fallback-strategy",
+      "to": "markdown-knowledge-graph"
+    },
+    {
+      "from": "model-fallback-strategy",
+      "to": "deployment-persistence-on-vercel"
     }
   ]
 }

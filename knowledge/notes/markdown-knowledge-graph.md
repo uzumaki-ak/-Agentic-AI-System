@@ -1,21 +1,39 @@
 ---
 title: Markdown knowledge graph
-updated: 2026-04-09T00:00:00.000Z
-query: storing compiled notes without rag
+updated: 2026-04-09T11:10:00.000Z
+query: compiled knowledge memory with markdown files
 ---
 
 # Markdown knowledge graph
 
 ## summary
-a local markdown graph can act as long term memory when each note keeps stable links and update metadata.
+markdown can act as a compiled knowledge layer when each note is atomic, linked, and indexed after every write.
 
 ## answer
-store one topic per markdown file with clear headings and wiki links using double bracket syntax.
-rebuild index files after each write so agents can discover the newest notes fast.
-this method keeps knowledge reviewable and git friendly.
+### data model
+- one topic per file under `knowledge/notes`
+- frontmatter includes title updated query
+- body includes summary answer related topics source notes
+
+### linking strategy
+- use `[[topic-slug]]` links to build a graph without external db
+- keep slugs stable so references do not break
+- include reciprocal links on important parent child concepts
+
+### index and graph compilation
+- `knowledge/index.md` is a human friendly note directory
+- `knowledge/graph.json` is machine readable for tooling and visualizations
+- rebuild both files after every note write to keep retrieval current
+
+### why this is useful
+- git diff friendly history for every knowledge change
+- transparent memory that can be reviewed by humans
+- low ops complexity for hackathon and interview demos
 
 ## related topics
 - [[agentic-workflow-basics]]
+- [[model-fallback-strategy]]
+- [[agentic-launch-roadmap]]
 
 ## source notes
-- none
+- https://ai.google.dev/gemini-api/docs/openai
