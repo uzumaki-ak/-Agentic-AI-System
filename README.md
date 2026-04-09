@@ -1,4 +1,5 @@
 # mini agentic ai system
+# demo-video:https://www.loom.com/share/e72dd1db25f44c27b27490f8150b20dc
 
 working mini agentic system built for a 3 to 4 hour hiring exercise.
 
