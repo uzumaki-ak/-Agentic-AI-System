@@ -2,6 +2,8 @@
 
 // this file renders query controls and output cards
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type AgentStatus = "idle" | "active" | "done";
 
@@ -69,6 +71,7 @@ export default function AgentConsole(): React.ReactElement {
   const [error, setError] = useState("");
   const [result, setResult] = useState<AgentRunResult | null>(null);
   const [copyState, setCopyState] = useState<"idle" | "done" | "error">("idle");
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [agentState, setAgentState] = useState<Record<string, AgentStatus>>(() =>
     initialAgentState()
   );
@@ -143,6 +146,7 @@ export default function AgentConsole(): React.ReactElement {
     setLoading(true);
     setError("");
     setResult(null);
+    setPreviewOpen(false);
     startStepAnimation();
 
     try {
@@ -327,6 +331,9 @@ export default function AgentConsole(): React.ReactElement {
                     ? "copy failed"
                     : "copy full report"}
               </button>
+              <button type="button" className="mini-button ghost" onClick={() => setPreviewOpen(true)}>
+                preview full report
+              </button>
               <button type="button" className="mini-button ghost" onClick={handleDownloadResult}>
                 download full .md
               </button>
@@ -385,6 +392,26 @@ export default function AgentConsole(): React.ReactElement {
             </pre>
           </article>
         </>
+      ) : null}
+
+      {previewOpen && result ? (
+        <div className="preview-overlay" onClick={() => setPreviewOpen(false)}>
+          <div className="preview-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="preview-head">
+              <h3>full report preview</h3>
+              <button
+                type="button"
+                className="mini-button ghost"
+                onClick={() => setPreviewOpen(false)}
+              >
+                close
+              </button>
+            </div>
+            <div className="preview-body markdown-preview">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{buildFullReport(result)}</ReactMarkdown>
+            </div>
+          </div>
+        </div>
       ) : null}
     </section>
   );
