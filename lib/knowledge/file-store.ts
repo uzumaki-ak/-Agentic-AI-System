@@ -4,10 +4,31 @@ import path from "node:path";
 import { NoteRecord, ValidatorResult } from "@/lib/agents/types";
 import { dedupeList, toSlug, toTitle } from "@/lib/utils/text";
 
-const KNOWLEDGE_ROOT = path.join(process.cwd(), "knowledge");
-const NOTES_ROOT = path.join(KNOWLEDGE_ROOT, "notes");
-const INDEX_FILE = path.join(KNOWLEDGE_ROOT, "index.md");
-const GRAPH_FILE = path.join(KNOWLEDGE_ROOT, "graph.json");
+const PROJECT_KNOWLEDGE_ROOT = path.join(process.cwd(), "knowledge");
+const RUNTIME_KNOWLEDGE_ROOT =
+  process.env.KNOWLEDGE_RUNTIME_ROOT ??
+  (process.env.VERCEL ? path.join("/tmp", "agentic-knowledge") : PROJECT_KNOWLEDGE_ROOT);
+
+type KnowledgePaths = {
+  root: string;
+  notesRoot: string;
+  indexFile: string;
+  graphFile: string;
+};
+
+const projectPaths: KnowledgePaths = {
+  root: PROJECT_KNOWLEDGE_ROOT,
+  notesRoot: path.join(PROJECT_KNOWLEDGE_ROOT, "notes"),
+  indexFile: path.join(PROJECT_KNOWLEDGE_ROOT, "index.md"),
+  graphFile: path.join(PROJECT_KNOWLEDGE_ROOT, "graph.json")
+};
+
+const runtimePaths: KnowledgePaths = {
+  root: RUNTIME_KNOWLEDGE_ROOT,
+  notesRoot: path.join(RUNTIME_KNOWLEDGE_ROOT, "notes"),
+  indexFile: path.join(RUNTIME_KNOWLEDGE_ROOT, "index.md"),
+  graphFile: path.join(RUNTIME_KNOWLEDGE_ROOT, "graph.json")
+};
 
 type SaveCompiledNoteInput = {
   query: string;
@@ -19,8 +40,99 @@ type SaveCompiledNoteInput = {
 };
 
 // this function makes a path readable in api responses
-function toProjectRelative(filePath: string): string {
-  return path.relative(process.cwd(), filePath).replace(/\\/g, "/");
+function toDisplayPath(filePath: string): string {
+  const normalized = filePath.replace(/\\/g, "/");
+  const cwdPath = process.cwd().replace(/\\/g, "/");
+  const runtimeRoot = runtimePaths.root.replace(/\\/g, "/");
+
+  if (normalized.startsWith(`${cwdPath}/`)) {
+    return normalized.slice(cwdPath.length + 1);
+  }
+
+  if (normalized.startsWith(`${runtimeRoot}/`)) {
+    return `runtime-knowledge/${normalized.slice(runtimeRoot.length + 1)}`;
+  }
+
+  return normalized;
+}
+
+// this function detects if runtime writes use a separate storage root
+function usesSeparateRuntimeStore(): boolean {
+  return path.resolve(runtimePaths.root) !== path.resolve(projectPaths.root);
+}
+
+// this function checks if a file path exists
+async function pathExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// this function returns markdown filenames from one notes directory
+async function readNoteFilenames(notesRoot: string): Promise<string[]> {
+  try {
+    const entries = await fs.readdir(notesRoot, { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"))
+      .map((entry) => entry.name);
+  } catch {
+    return [];
+  }
+}
+
+// this function writes a file only if missing
+async function writeIfMissing(filePath: string, content: string): Promise<void> {
+  if (await pathExists(filePath)) {
+    return;
+  }
+  await fs.writeFile(filePath, content, "utf8");
+}
+
+// this function copies base knowledge notes into runtime storage when empty
+async function seedRuntimeNotesIfEmpty(): Promise<void> {
+  if (!usesSeparateRuntimeStore()) {
+    return;
+  }
+
+  const runtimeFiles = await readNoteFilenames(runtimePaths.notesRoot);
+  if (runtimeFiles.length > 0) {
+    return;
+  }
+
+  const projectFiles = await readNoteFilenames(projectPaths.notesRoot);
+  for (const name of projectFiles) {
+    const sourcePath = path.join(projectPaths.notesRoot, name);
+    const targetPath = path.join(runtimePaths.notesRoot, name);
+    try {
+      const content = await fs.readFile(sourcePath, "utf8");
+      await fs.writeFile(targetPath, content, "utf8");
+    } catch {
+      // no op
+    }
+  }
+}
+
+// this function initializes runtime index and graph files
+async function ensureRuntimeIndexFiles(): Promise<void> {
+  if (usesSeparateRuntimeStore()) {
+    if (!(await pathExists(runtimePaths.indexFile)) && (await pathExists(projectPaths.indexFile))) {
+      const source = await fs.readFile(projectPaths.indexFile, "utf8");
+      await fs.writeFile(runtimePaths.indexFile, source, "utf8");
+    }
+    if (!(await pathExists(runtimePaths.graphFile)) && (await pathExists(projectPaths.graphFile))) {
+      const source = await fs.readFile(projectPaths.graphFile, "utf8");
+      await fs.writeFile(runtimePaths.graphFile, source, "utf8");
+    }
+  }
+
+  await writeIfMissing(runtimePaths.indexFile, "# knowledge index\n\nlast updated: never\n\n## notes\n");
+  await writeIfMissing(
+    runtimePaths.graphFile,
+    JSON.stringify({ updatedAt: "never", nodes: [], edges: [] }, null, 2)
+  );
 }
 
 // this function reads title from markdown content
@@ -62,54 +174,56 @@ function collectWikiLinks(content: string): string[] {
 
 // this function ensures local folders and base files exist
 export async function ensureKnowledgeStore(): Promise<void> {
-  await fs.mkdir(NOTES_ROOT, { recursive: true });
+  await fs.mkdir(runtimePaths.notesRoot, { recursive: true });
+  await seedRuntimeNotesIfEmpty();
+  await ensureRuntimeIndexFiles();
+}
 
-  try {
-    await fs.access(INDEX_FILE);
-  } catch {
-    await fs.writeFile(INDEX_FILE, "# knowledge index\n\nlast updated: never\n\n## notes\n", "utf8");
+// this function reads notes from one specific notes directory
+async function readNotesFromRoot(notesRoot: string): Promise<NoteRecord[]> {
+  const files = await readNoteFilenames(notesRoot);
+  const notes: NoteRecord[] = [];
+
+  for (const name of files) {
+    const fullPath = path.join(notesRoot, name);
+    try {
+      const content = await fs.readFile(fullPath, "utf8");
+      const slug = toSlug(name.replace(/\.md$/i, ""));
+      notes.push({
+        slug,
+        title: readTitle(content, toTitle(slug.replace(/-/g, " "))),
+        path: toDisplayPath(fullPath),
+        content,
+        updatedAt: readUpdated(content)
+      });
+    } catch {
+      // no op
+    }
   }
 
-  try {
-    await fs.access(GRAPH_FILE);
-  } catch {
-    await fs.writeFile(
-      GRAPH_FILE,
-      JSON.stringify({ updatedAt: "never", nodes: [], edges: [] }, null, 2),
-      "utf8"
-    );
-  }
+  return notes;
 }
 
 // this function reads every markdown note in the knowledge folder
 export async function readAllNotes(): Promise<NoteRecord[]> {
   await ensureKnowledgeStore();
-  const entries = await fs.readdir(NOTES_ROOT, { withFileTypes: true });
 
-  const files = entries
-    .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"))
-    .map((entry) => entry.name);
-
-  const notes: NoteRecord[] = [];
-
-  for (const name of files) {
-    const fullPath = path.join(NOTES_ROOT, name);
-    const content = await fs.readFile(fullPath, "utf8");
-    const slug = toSlug(name.replace(/\.md$/i, ""));
-    notes.push({
-      slug,
-      title: readTitle(content, toTitle(slug.replace(/-/g, " "))),
-      path: toProjectRelative(fullPath),
-      content,
-      updatedAt: readUpdated(content)
-    });
+  const merged = new Map<string, NoteRecord>();
+  const projectNotes = await readNotesFromRoot(projectPaths.notesRoot);
+  for (const note of projectNotes) {
+    merged.set(note.slug, note);
   }
 
-  return notes.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  const runtimeNotes = await readNotesFromRoot(runtimePaths.notesRoot);
+  for (const note of runtimeNotes) {
+    merged.set(note.slug, note);
+  }
+
+  return Array.from(merged.values()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 // this function builds index and graph files from all notes
-async function rebuildIndexAndGraph(notes: NoteRecord[]): Promise<void> {
+async function rebuildIndexAndGraph(notes: NoteRecord[], target: KnowledgePaths): Promise<void> {
   const now = new Date().toISOString();
 
   const indexLines = [
@@ -124,7 +238,7 @@ async function rebuildIndexAndGraph(notes: NoteRecord[]): Promise<void> {
     indexLines.push(`- [${note.title}](notes/${note.slug}.md) updated ${note.updatedAt}`);
   }
 
-  await fs.writeFile(INDEX_FILE, `${indexLines.join("\n")}\n`, "utf8");
+  await fs.writeFile(target.indexFile, `${indexLines.join("\n")}\n`, "utf8");
 
   const nodes = notes.map((note) => ({
     slug: note.slug,
@@ -142,7 +256,7 @@ async function rebuildIndexAndGraph(notes: NoteRecord[]): Promise<void> {
   }
 
   await fs.writeFile(
-    GRAPH_FILE,
+    target.graphFile,
     JSON.stringify(
       {
         updatedAt: now,
@@ -211,20 +325,28 @@ export async function saveCompiledNote(
 
   const slug = toSlug(input.query) || `note-${Date.now()}`;
   const title = toTitle(input.query);
-  const filePath = path.join(NOTES_ROOT, `${slug}.md`);
+  const filePath = path.join(runtimePaths.notesRoot, `${slug}.md`);
   const noteMarkdown = buildNoteMarkdown(input, title);
 
-  await fs.writeFile(filePath, noteMarkdown, "utf8");
+  try {
+    await fs.writeFile(filePath, noteMarkdown, "utf8");
 
-  const notes = await readAllNotes();
-  await rebuildIndexAndGraph(notes);
+    const notes = await readAllNotes();
+    await rebuildIndexAndGraph(notes, runtimePaths);
 
-  return {
-    touchedFiles: [
-      toProjectRelative(filePath),
-      toProjectRelative(INDEX_FILE),
-      toProjectRelative(GRAPH_FILE)
-    ],
-    preview: noteMarkdown.slice(0, 1800)
-  };
+    return {
+      touchedFiles: [
+        toDisplayPath(filePath),
+        toDisplayPath(runtimePaths.indexFile),
+        toDisplayPath(runtimePaths.graphFile)
+      ],
+      preview: noteMarkdown.slice(0, 1800)
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "write failed";
+    return {
+      touchedFiles: [`write skipped: ${message}`],
+      preview: noteMarkdown.slice(0, 1800)
+    };
+  }
 }
