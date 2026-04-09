@@ -10,6 +10,15 @@ working mini agentic system built for a 3 to 4 hour hiring exercise.
 - simple black and white ui with live animated agent states
 - multi provider model fallback for free model usage first
 
+## example queries
+copy paste these directly into the app input:
+
+1. `create a production architecture plan to add supabase auth later without breaking the local markdown workflow and include one mermaid flowchart`
+2. `design a 30 day launch roadmap for this mini agentic ai system with weekly milestones risks mitigation and measurable success criteria`
+3. `compare local markdown compiled knowledge vs rag for early stage products and recommend a migration path from local files to cloud persistence`
+4. `write an observability and reliability plan for this multi agent workflow including tracing fallback monitoring error budgets and incident response`
+5. `propose a secure enterprise upgrade plan with auth roles audit logging pii controls and deployment strategy while preserving current agent contracts`
+
 ## tech stack
 - next js 16 with app router
 - typescript
